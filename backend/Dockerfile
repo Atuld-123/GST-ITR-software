@@ -5,7 +5,9 @@ COPY pyproject.toml ./
 COPY --chown=10001:10001 app ./app
 COPY --chown=10001:10001 alembic.ini ./
 COPY --chown=10001:10001 alembic ./alembic
+COPY scripts/render-start.sh /usr/local/bin/render-start
 RUN pip install --no-cache-dir .
+RUN chmod 755 /usr/local/bin/render-start
 RUN useradd --system --uid 10001 --create-home taxsphere && chown -R taxsphere:taxsphere /app
 USER taxsphere
 EXPOSE 8000
