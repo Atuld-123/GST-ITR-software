@@ -10,6 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setSaving(true);
     const form = new FormData(event.currentTarget);
@@ -26,5 +27,5 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (caughtError) { setError(caughtError instanceof SyntaxError ? "Service temporarily unavailable. Start Docker Desktop and the TaxSphere database, then try again." : caughtError instanceof Error ? caughtError.message : "Unable to sign in"); } finally { setSaving(false); }
   }
-  return <main className="onboarding"><FlashNotice /><section><p className="eyebrow">TAXSPHERE INDIA DESKTOP</p><h1>Admin sign in</h1><p className="sub">This workspace is for authorized organization administrators and employees only.</p><form onSubmit={submit}><label>Work email<input name="email" type="email" required autoComplete="email" /></label><label>Password<input name="password" type="password" required autoComplete="current-password" /></label>{error && <p className="form-error">{error}</p>}<button className="primary" disabled={saving}>{saving ? "Signing in..." : "Sign in"}</button></form><p className="tiny">New organization? Use the administrator workspace setup once.</p><a className="back" href="/onboarding">Create administrator workspace</a></section></main>;
+  return <main className="onboarding"><FlashNotice /><section><p className="eyebrow">TAXSPHERE INDIA DESKTOP</p><h1>Admin sign in</h1><p className="sub">This workspace is for authorized organization administrators and employees only.</p><form onSubmit={submit}><label>Work email<input name="email" type="email" required autoComplete="email" /></label><label>Password<div className="password-field"><input name="password" type={showPassword ? "text" : "password"} required autoComplete="current-password" /><button className="password-toggle" type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "Hide" : "Show"}</button></div></label>{error && <p className="form-error">{error}</p>}<button className="primary" disabled={saving}>{saving ? "Signing in..." : "Sign in"}</button></form><p className="tiny">New organization? Use the administrator workspace setup once.</p><a className="back" href="/onboarding">Create administrator workspace</a></section></main>;
 }
