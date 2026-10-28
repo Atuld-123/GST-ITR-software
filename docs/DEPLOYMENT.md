@@ -9,6 +9,14 @@
 5. If PostgreSQL already has a data volume, create the app and migration roles manually before deployment. The bootstrap init script runs only when PostgreSQL initializes a fresh data directory.
 6. Verify `/health`, sign-in, organization membership, document upload/download, GST estimate/export and review permissions using test data. Do not use real filings until the tax workflow and security review are approved.
 
+## Render preview
+
+The root `render.yaml` defines a preview deployment with a Docker API, a Docker web service and PostgreSQL. In Render, choose **New > Blueprint**, connect the GitHub repository, and apply the Blueprint. Render will ask for `DOCUMENTS_ENCRYPTION_KEY`; generate it with the command below and save it as a Render secret. The Blueprint runs database migrations when the API starts and routes browser API calls through the public HTTPS API hostname.
+
+This free configuration is for a temporary preview only. Render's free PostgreSQL database expires after 30 days and has no backups; free web services can sleep when idle. Do not store real client documents or production records there. For production, change both web plans and the database to paid plans, set up backups and restore checks, and review database role separation and operational monitoring before onboarding clients. The single Render database uses one owner connection for API and migrations, so it does not yet provide the separate runtime and migrator roles used by the Docker Compose production setup.
+
+Render Blueprint deployment requires the GitHub repository to be connected to the Render account. The repo itself does not contain the secret key.
+
 Generate secrets without putting them in source control: `python -c "import secrets; print(secrets.token_urlsafe(48))"` for `JWT_SECRET` and database passwords; `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` for `DOCUMENTS_ENCRYPTION_KEY`. Use independent values for each secret.
 
 ## Configuration and security

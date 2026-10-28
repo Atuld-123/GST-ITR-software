@@ -16,6 +16,21 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def require_production_settings(self):
         if self.app_environment.lower() == "production":
+            # Render supplies PostgreSQL connection strings without a driver
+            # suffix and exposes its service hostnames without a URL scheme.
+            if self.database_url.startswith("postgres://"):
+                self.database_url = "postgresql+asyncpg://" + self.database_url[len("postgres://"):]
+            elif self.database_url.startswith("postgresql://"):
+                self.database_url = "postgresql+asyncpg://" + self.database_url[len("postgresql://"):]
+            if self.database_url.startswith("postgresql+asyncpg://"):
+                url, separator, query = self.database_url.partition("?")
+                if "sslmode=require" in query:
+                    query = query.replace("sslmode=require", "ssl=require")
+                elif "ssl=require" not in query:
+                    query += ("&" if query else "") + "ssl=require"
+                self.database_url = url + "?" + query
+            if self.frontend_origin and not self.frontend_origin.startswith(("http://", "https://")):
+                self.frontend_origin = "https://" + self.frontend_origin
             if not self.database_url.startswith("postgresql+asyncpg://"):
                 raise ValueError("Production requires PostgreSQL DATABASE_URL")
             if len(self.jwt_secret) < 32 or self.jwt_secret == "development-only-change-me":
