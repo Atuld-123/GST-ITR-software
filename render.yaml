@@ -42,7 +42,4 @@ services:
     healthCheckPath: /
     envVars:
       - key: TAXSPHERE_API_INTERNAL_URL
-        fromService:
-          type: web
-          name: taxsphere-api
-          envVarKey: RENDER_EXTERNAL_HOSTNAME
+        value: https://taxsphere-api.onrender.com
